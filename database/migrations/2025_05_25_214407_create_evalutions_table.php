@@ -18,9 +18,9 @@ return new class extends Migration
             $table->date('dateDebut');
             $table->date('dateFin');
             $table->string('statut')->default('en cours');
-$table->foreignId('user_id')->constrained('users')->onDelete('cascade');;
-$table->foreignId('manager_id')->constrained('users')->onDelete('cascade');;
-$table->foreignId('campagne_evaluations_id')->constrained('users')->onDelete('cascade');;
+$table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+$table->foreignId('manager_id')->constrained('users')->onDelete('cascade');
+$table->foreignId('campagne_evaluations_id')->constrained('campagne_evaluations')->onDelete('cascade');
 
 
             
@@ -33,6 +33,6 @@ $table->foreignId('campagne_evaluations_id')->constrained('users')->onDelete('ca
      */
     public function down(): void
     {
-        Schema::dropIfExists('evalutions');
+        Schema::dropIfExists('evaluations');
     }
 };
