@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class RoleController extends Controller
 {
     /**
-     * Affiche la liste des rôles
+     * Affiche la liste de tous les rôles.
      */
     public function index()
     {
@@ -17,7 +17,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Affiche le formulaire de création d’un rôle
+     * Affiche le formulaire de création d’un nouveau rôle.
      */
     public function create()
     {
@@ -25,7 +25,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Enregistre un nouveau rôle
+     * Enregistre un nouveau rôle dans la base de données.
      */
     public function store(Request $request)
     {
@@ -39,7 +39,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Affiche un rôle spécifique
+     * Affiche les détails d’un rôle spécifique.
      */
     public function show(Role $role)
     {
@@ -47,7 +47,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Affiche le formulaire d’édition d’un rôle
+     * Affiche le formulaire d’édition d’un rôle.
      */
     public function edit(Role $role)
     {
@@ -55,7 +55,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Met à jour un rôle existant
+     * Met à jour un rôle existant dans la base de données.
      */
     public function update(Request $request, Role $role)
     {
@@ -69,7 +69,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Supprime un rôle
+     * Supprime un rôle de la base de données.
      */
     public function destroy(Role $role)
     {

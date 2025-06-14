@@ -9,6 +9,17 @@ class Evaluation extends Model
 {
     use HasFactory;
 
+    // Champs autorisés à l'assignation en masse
+    protected $fillable = [
+        'titre',
+        'description',
+        'dateDebut',
+        'dateFin',
+        'statut',
+        'user_id',
+        'manager_id',
+        'campagne_evaluations_id',
+    ];
 
     /**
      * L'utilisateur évalué (probablement un employé).
@@ -33,4 +44,4 @@ class Evaluation extends Model
     {
         return $this->belongsTo(CampagneEvaluation::class, 'campagne_evaluations_id');
     }
-}  
+}

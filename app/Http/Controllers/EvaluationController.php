@@ -3,25 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\Evaluation;
+use App\Models\User;
+use App\Models\CampagneEvaluation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class EvaluationController extends Controller
 {
-    // Affiche la liste des évaluations de l'utilisateur connecté
+    // Liste toutes les évaluations
     public function index()
     {
-        $evaluations = Evaluation::where('user_id', Auth::id())->get();
-        return view('evaluation.index', compact('evaluations'));
+        $evaluations = Evaluation::with(['user', 'manager', 'campagne'])->get();
+        return view('evaluations.index', compact('evaluations'));
     }
 
-    // Affiche le formulaire de création d'une évaluation
+    // Affiche le formulaire de création
     public function create()
     {
-        return view('evaluation.creation');
+        // Utilisateurs sans rôle manager
+        $users = User::whereDoesntHave('role', function ($query) {
+            $query->where('libelle', 'manager');
+        })->get();
+
+        // Utilisateurs avec rôle manager
+        $managers = User::whereHas('role', function ($query) {
+            $query->where('libelle', 'manager');
+        })->get();
+
+        $campagnes = CampagneEvaluation::all();
+
+        return view('evaluations.creation', compact('users', 'managers', 'campagnes'));
     }
 
-    // Enregistre une nouvelle évaluation
+    // Enregistre une évaluation
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -29,67 +42,80 @@ class EvaluationController extends Controller
             'description' => 'required|string',
             'dateDebut' => 'required|date',
             'dateFin' => 'required|date|after_or_equal:dateDebut',
-            'statut' => 'required|string|max:50',
-            'manager_id' => 'nullable|exists:users,id',
+            'statut' => 'required|string|in:en attente,en cours,terminée,annulée',
+            'manager_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id|different:manager_id',
             'campagne_evaluations_id' => 'nullable|exists:campagne_evaluations,id',
         ]);
 
-        $validated['user_id'] = Auth::id(); // Ajout automatique de l’utilisateur connecté
+        // Vérifie que le manager a bien le rôle 'manager'
+        $manager = User::with('role')->find($validated['manager_id']);
+        if (!$manager || $manager->role->libelle !== 'manager') {
+            return back()->withErrors(['manager_id' => 'L\'utilisateur sélectionné n\'est pas un manager.'])->withInput();
+        }
 
         Evaluation::create($validated);
 
         return redirect()->route('evaluations.index')->with('success', 'Évaluation créée avec succès.');
     }
 
-    // Affiche les détails d'une évaluation
+    // Affiche une évaluation spécifique
     public function show($id)
     {
-        $evaluation = Evaluation::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
-        return view('evaluation.show', compact('evaluation'));
+        $evaluation = Evaluation::with(['user', 'manager', 'campagne'])->findOrFail($id);
+        return view('evaluations.show', compact('evaluation'));
     }
 
-    // Affiche le formulaire d'édition d'une évaluation
+    // Formulaire d'édition
     public function edit($id)
     {
-        $evaluation = Evaluation::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        $evaluation = Evaluation::findOrFail($id);
 
-        return view('evaluation.edit', compact('evaluation'));
+        // Utilisateurs sans rôle manager
+        $users = User::whereDoesntHave('role', function ($query) {
+            $query->where('libelle', 'manager');
+        })->get();
+
+        // Utilisateurs avec rôle manager
+        $managers = User::whereHas('role', function ($query) {
+            $query->where('libelle', 'manager');
+        })->get();
+
+        $campagnes = CampagneEvaluation::all();
+
+        return view('evaluations.modification', compact('evaluation', 'users', 'managers', 'campagnes'));
     }
 
-    // Met à jour une évaluation
+    // Mise à jour
     public function update(Request $request, $id)
     {
-        $evaluation = Evaluation::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        $evaluation = Evaluation::findOrFail($id);
 
         $validated = $request->validate([
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
             'dateDebut' => 'required|date',
             'dateFin' => 'required|date|after_or_equal:dateDebut',
-            'statut' => 'required|string|max:50',
-            'manager_id' => 'nullable|exists:users,id',
+            'statut' => 'required|string|in:en attente,en cours,terminée,annulée',
+            'manager_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id|different:manager_id',
             'campagne_evaluations_id' => 'nullable|exists:campagne_evaluations,id',
         ]);
+
+        $manager = User::with('role')->find($validated['manager_id']);
+        if (!$manager || $manager->role->libelle !== 'manager') {
+            return back()->withErrors(['manager_id' => 'L\'utilisateur sélectionné n\'est pas un manager.'])->withInput();
+        }
 
         $evaluation->update($validated);
 
         return redirect()->route('evaluations.index')->with('success', 'Évaluation mise à jour avec succès.');
     }
 
-    // Supprime une évaluation
+    // Suppression
     public function destroy($id)
     {
-        $evaluation = Evaluation::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
+        $evaluation = Evaluation::findOrFail($id);
         $evaluation->delete();
 
         return redirect()->route('evaluations.index')->with('success', 'Évaluation supprimée avec succès.');
