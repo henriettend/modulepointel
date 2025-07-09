@@ -13,14 +13,17 @@
 
     {{-- Lien vers la création --}}
     <div class="mb-3">
-        <a href="{{ route('grilles.create') }}" class="btn btn-primary">Créer une nouvelle Grille</a>
+<a href="{{ route('grilleEvaluation.creation') }}"
+   class="btn"
+   style="background-color: #ff9911; color: white; border: none;">
+   Créer une nouvelle Grille
+</a>
     </div>
 
     {{-- Tableau des grilles --}}
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
         <tr>
-            <th>#</th>
             <th>Titre</th>
             <th>Description</th>
             <th>Campagne</th>
@@ -30,7 +33,6 @@
         <tbody>
         @forelse ($grilles as $grille)
             <tr>
-                <td>{{ $grille->id }}</td>
                 <td>{{ $grille->titre }}</td>
                 <td>{{ $grille->description }}</td>
                 <td>{{ $grille->campagne->titre ?? 'Non défini' }}</td>

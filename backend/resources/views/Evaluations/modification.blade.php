@@ -60,7 +60,6 @@
           @enderror
         </div>
 
-        <!-- Employé évalué (sans managers) -->
         <div class="mb-3">
           <label for="user_id" class="form-label">Employé évalué</label>
           <select class="form-select" id="user_id" name="user_id" required>
@@ -76,7 +75,6 @@
           @enderror
         </div>
 
-        <!-- Manager -->
         <div class="mb-3">
           <label for="manager_id" class="form-label">Manager</label>
           <select class="form-select" id="manager_id" name="manager_id" required>
@@ -92,7 +90,6 @@
           @enderror
         </div>
 
-        <!-- Campagne d'évaluation -->
         <div class="mb-3">
           <label for="campagne_evaluations_id" class="form-label">Campagne d'évaluation</label>
           <select class="form-select" id="campagne_evaluations_id" name="campagne_evaluations_id">

@@ -20,35 +20,35 @@ class Evaluation extends Model
         'campagne_evaluations_id',
         'type_evaluation_id',
     ];
-
     
-     //L'utilisateur évalué (probablement un employé).
-     
+
+    // L'utilisateur évalué (probablement un employé).
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    
-     //Le manager qui évalue.
-     
+    // Le manager qui évalue.
     public function manager()
     {
         return $this->belongsTo(User::class, 'manager_id');
     }
 
-    
-     // La campagne d'évaluation liée.
+    // La campagne d'évaluation liée.
     public function campagne()
     {
         return $this->belongsTo(CampagneEvaluation::class, 'campagne_evaluations_id');
     }
 
-    
-      //Le type d'évaluation associé.
-     
-    public function type()
+    // Le type d'évaluation associé.
+    public function typeEvaluation()
     {
         return $this->belongsTo(TypeEvaluation::class, 'type_evaluation_id');
+    }
+
+    // Compétences associées à cette évaluation.
+    public function competences()
+    {
+        return $this->belongsToMany(Competence::class, 'competence_evaluation', 'evaluation_id', 'competence_id');
     }
 }

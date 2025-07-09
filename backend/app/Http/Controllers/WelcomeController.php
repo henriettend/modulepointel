@@ -10,7 +10,7 @@ class WelcomeController extends Controller
 {
     public function index()
     {
-        return view('welcome'); // Crée une vue resources/views/dashboard.blade.php
+        return view('welcome'); 
     }
 }
 

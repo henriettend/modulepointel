@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('titre');
             $table->text('description')->nullable();
-        
+
+            // Clé étrangère vers la table competences
+            $table->foreignId('competence_id')->constrained('competences')->onDelete('cascade');
+
             $table->timestamps();
         });
     }

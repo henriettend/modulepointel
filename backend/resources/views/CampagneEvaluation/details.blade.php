@@ -39,7 +39,7 @@
                 <a href="{{ route('campagneEvaluation.index') }}" 
                    class="btn btn-lg" 
                    style="background-color: #ff9911; color: white; border: none;">
-                    + Créer une campagne
+                    Retour à la liste des campagnes
                 </a>
             </div>
         </div>

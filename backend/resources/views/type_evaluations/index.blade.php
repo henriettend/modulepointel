@@ -8,15 +8,19 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <a href="{{ route('type_evaluations.creation') }}" class="btn btn-primary mb-3">Ajouter un type</a>
+        <a href="{{ route('type_evaluations.creation') }}" 
+           class="btn btn-primary mb-3"
+           title="Ajouter un type d’évaluation">
+            <i class="bi bi-plus-lg"></i>
+        </a>
 
         @if($types->count() > 0)
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped align-middle">
                 <thead>
                     <tr>
                         <th>Intitulé</th>
                         <th>Description</th>
-                        <th>Actions</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -24,14 +28,38 @@
                     <tr>
                         <td>{{ $type->intitule }}</td>
                         <td>{{ $type->description }}</td>
-                        <td>
-                            <a href="{{ route('type_evaluations.modification', $type->id) }}" class="btn btn-sm btn-warning">Modifier</a>
-                            <a href="{{ route('type_evaluations.details', $type->id) }}" class="btn btn-sm btn-info">Détails</a>
-                            <form action="{{ route('type_evaluations.suppression', $type->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?');">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
-                            </form>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                {{-- Modifier --}}
+                                <a href="{{ route('type_evaluations.modification', $type->id) }}" 
+                                   class="btn btn-sm btn-warning d-flex justify-content-center align-items-center"
+                                   style="width: 36px; height: 36px; padding: 0;"
+                                   title="Modifier">
+                                    <i class="bi bi-pencil-square text-dark fs-5"></i>
+                                </a>
+
+                                {{-- Détails --}}
+                                <a href="{{ route('type_evaluations.details', $type->id) }}" 
+                                   class="btn btn-sm btn-info d-flex justify-content-center align-items-center"
+                                   style="width: 36px; height: 36px; padding: 0;"
+                                   title="Détails">
+                                    <i class="bi bi-info-circle text-white fs-5"></i>
+                                </a>
+
+                                {{-- Supprimer --}}
+                                <form action="{{ route('type_evaluations.suppression', $type->id) }}" 
+                                      method="POST" class="d-inline-block"
+                                      onsubmit="return confirm('Confirmer la suppression ?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="btn btn-sm btn-danger d-flex justify-content-center align-items-center"
+                                            style="width: 36px; height: 36px; padding: 0;"
+                                            title="Supprimer">
+                                        <i class="bi bi-trash text-white fs-5"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @endforeach
@@ -41,5 +69,4 @@
             <p>Aucun type d'évaluation trouvé.</p>
         @endif
     </div>
-
-   @endsection
+@endsection

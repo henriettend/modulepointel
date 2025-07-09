@@ -28,34 +28,34 @@
                                 <td>{{ $campagne->dateFin }}</td>
                                 <td>{{ $campagne->statut }}</td>
                                 <td class="d-flex gap-2">
-    <a href="{{ route('campagneEvaluation.details', $campagne->id) }}" 
-       class="btn btn-sm d-inline-flex align-items-center" 
-       style="background-color: #0dcaf0; color: white;" 
-       title="Détails">
-        <i class="bi bi-info-circle me-1"></i> Détails
-    </a>
+                                    <a href="{{ route('campagneEvaluation.details', $campagne->id) }}" 
+                                       class="btn btn-sm btn-info d-inline-flex align-items-center justify-content-center"
+                                       style="width: 38px; height: 38px; padding: 0;"
+                                       title="Détails">
+                                        <i class="bi bi-info-circle" style="font-size: 1.2rem; color: white;"></i>
+                                    </a>
 
-    <a href="{{ route('campagneEvaluation.modification', $campagne->id) }}" 
-       class="btn btn-sm d-inline-flex align-items-center" 
-       style="background-color: #ffc107; color: black;" 
-       title="Modifier">
-        <i class="bi bi-pencil-square me-1"></i> Modifier
-    </a>
+                                    <a href="{{ route('campagneEvaluation.modification', $campagne->id) }}" 
+                                       class="btn btn-sm btn-warning d-inline-flex align-items-center justify-content-center"
+                                       style="width: 38px; height: 38px; padding: 0;"
+                                       title="Modifier">
+                                        <i class="bi bi-pencil-square" style="font-size: 1.2rem; color: black;"></i>
+                                    </a>
 
-    <form action="{{ route('campagneEvaluation.suppression', $campagne->id) }}" 
-          method="POST" 
-          onsubmit="return confirm('Confirmer la suppression ?')">
-        @csrf
-        @method('DELETE')
-        <button type="submit" 
-                class="btn btn-sm d-inline-flex align-items-center" 
-                style="background-color: #dc3545; color: white;" 
-                title="Supprimer">
-            <i class="bi bi-trash me-1"></i> Supprimer
-        </button>
-    </form>
-</td>
-
+                                    <form action="{{ route('campagneEvaluation.suppression', $campagne->id) }}" 
+                                          method="POST" 
+                                          onsubmit="return confirm('Confirmer la suppression ?')"
+                                          style="display: inline-block;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-danger d-inline-flex align-items-center justify-content-center"
+                                                style="width: 38px; height: 38px; padding: 0;"
+                                                title="Supprimer">
+                                            <i class="bi bi-trash" style="font-size: 1.2rem; color: white;"></i>
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

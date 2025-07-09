@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('historiques', function (Blueprint $table) {
             $table->id();
             $table->string('description');
-$table->foreignId('user_id')->constrained()->onDelete('cascade'); // fait référence à la table "users"
+             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // fait référence à la table "users"
             $table->timestamps();
         });
     }

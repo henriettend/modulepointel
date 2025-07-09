@@ -34,7 +34,7 @@
                 <select name="campagne_evaluations_id" id="campagne_evaluations_id" class="form-select" required>
                     <option value="">-- Sélectionner une campagne --</option>
                     @foreach ($campagnes as $campagne)
-                        <option value="{{ $campagne->id }}" {{ old('campagne_evaluations_id') == $campagne->id 'selected' : '' }}>
+                    <option value="{{ $campagne->id }}" {{ old('campagne_evaluations_id') == $campagne->id ? 'selected' : '' }}>
                             {{ $campagne->titre }}
                         </option>
                     @endforeach

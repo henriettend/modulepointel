@@ -2,16 +2,16 @@
 
 @section('content')
     <div class="container mt-5">
-        <div class="card-style">
-            <h1>Liste des Rôles</h1>
+        <div class="card p-4 shadow-sm rounded-3">
+            <h2 class="mb-4 text-primary">Liste des Rôles</h2>
 
             <div class="table-responsive">
-                <table>
-                    <thead>
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
                             <th>ID</th>
                             <th>Libellé</th>
-                            <th>Actions</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -19,32 +19,57 @@
                             <tr>
                                 <td>{{ $role->id }}</td>
                                 <td>{{ $role->libelle }}</td>
-                                <td>
-                                    <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-sm btn-warning me-2" title="Modifier">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
 
-                                    <form action="{{ route('roles.destroy', $role->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                        {{-- Détails --}}
+                                        <a href="{{ route('roles.details', $role->id) }}"
+                                           class="btn btn-sm btn-info d-inline-flex align-items-center justify-content-center"
+                                           style="width: 38px; height: 38px; padding: 0;"
+                                           title="Détails">
+                                            <i class="bi bi-info-circle text-white fs-5"></i>
+                                        </a>
+
+                                        {{-- Modifier --}}
+                                        <a href="{{ route('roles.modification', $role->id) }}"
+                                           class="btn btn-sm btn-warning d-inline-flex align-items-center justify-content-center"
+                                           style="width: 38px; height: 38px; padding: 0;"
+                                           title="Modifier">
+                                            <i class="bi bi-pencil-square text-dark fs-5"></i>
+                                        </a>
+
+                                        {{-- Supprimer --}}
+                                        <form action="{{ route('roles.suppression', $role->id) }}"
+                                              method="POST"
+                                              class="d-inline-block"
+                                              onsubmit="return confirm('Confirmer la suppression ?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-danger d-inline-flex align-items-center justify-content-center"
+                                                    style="width: 38px; height: 38px; padding: 0;"
+                                                    title="Supprimer">
+                                                <i class="bi bi-trash text-white fs-5"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="empty-msg text-center">Aucun rôle enregistré.</td>
+                                <td colspan="3" class="text-center text-muted">Aucun rôle enregistré.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <div class="text-center">
-                <a href="{{ route('roles.creation') }}" class="btn btn-success">
-                    <i class="bi bi-plus-lg"></i> Créer un rôle
+            <div class="text-center mt-4">
+                <a href="{{ route('roles.creation') }}"
+                   class="btn btn-lg"
+                   style="background-color: #ff9911; color: white;"
+                   title="Ajouter un rôle">
+                    <i class="bi bi-plus-lg fs-4"></i>
                 </a>
             </div>
         </div>

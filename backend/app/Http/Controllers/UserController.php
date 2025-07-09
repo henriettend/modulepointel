@@ -35,18 +35,14 @@ class UserController extends Controller
 
 
 
-    /**
-     * Afficher le formulaire de création d'un utilisateur.
-     */
+    
     public function create()
     {
-        $roles = Role::all(); // Récupérer tous les rôles
+        $roles = Role::all(); 
         return view('users.creation', compact('roles'));
     }
 
-    /**
-     * Enregistrer un nouvel utilisateur.
-     */
+   
     public function store(Request $request)
     {
         // Validation des données reçues
@@ -87,7 +83,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $roles = Role::all();
-        return view('users.modification', compact('user', 'roles'));
+        return view('users.index', compact('user', 'roles'));
     }
 
     /**

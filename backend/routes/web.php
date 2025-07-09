@@ -15,70 +15,96 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TypeEvaluationController;
 use App\Http\Controllers\UserController;
-
-/*
-|--------------------------------------------------------------------------
-| Routes publiques (connexion, déconnexion)
-|--------------------------------------------------------------------------
-*/
+use App\Models\Evaluation;
+use App\Mail\NotificationEvaluation;
+use Illuminate\Support\Facades\Mail;
 
 // Page de connexion affichée par défaut quand on visite le site
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('/connexion', [AuthenticatedSessionController::class, 'store'])->name('login.post');
 
-/*
-|--------------------------------------------------------------------------
-| Routes protégées par authentification
-|--------------------------------------------------------------------------
-*/
-
 Route::middleware(['auth'])->group(function () {
 
-    // Tableau de bord
     Route::get('/dashboard', function () {
-        return view('welcome');
-    })->name('dashboard.index');
+
+        // Récupération des statistiques
+        $totalEvaluations = Evaluation::count();
+        $evaluationsTermines = Evaluation::where('statut', 'terminée')->count();
+        $evaluationsEnCours = Evaluation::where('statut', 'en cours')->count();
+        $evaluationsAnnules = Evaluation::where('statut', 'annulée')->count();  
+        $evaluationsEnAttente = Evaluation::where('statut', 'en attente')->count();
+        // Calcul du taux de participation
+        $employesEvalues = Evaluation::where('statut', 'terminée')->distinct('user_id')->count('user_id');
+        $totalUsers = \App\Models\User::count();
+        $tauxParticipation = $totalUsers > 0 ? ($employesEvalues / $totalUsers) * 100 : 0;
+        $tauxParticipation = round($tauxParticipation, 2);
+
+        return view('welcome', compact(
+            'totalEvaluations',
+            'evaluationsTermines',
+            'evaluationsEnCours',
+            'evaluationsAnnules',
+            'evaluationsEnAttente',
+            'tauxParticipation'
+            ,'employesEvalues',
+            'totalUsers'
+
+            
+
+        ));
+    })->name('dashboard');
 
     // Campagnes d'Évaluation
-    Route::get('/campagnes/index', [CampagneEvaluationController::class, 'index'])->name('campagneEvaluation.index');
-    Route::get('/campagnes/creation', [CampagneEvaluationController::class, 'create'])->name('campagneEvaluation.creation');
-    Route::post('/campagnes', [CampagneEvaluationController::class, 'store'])->name('campagneEvaluation.store');
-    Route::get('/campagnes/modification/{id}', [CampagneEvaluationController::class, 'edit'])->name('campagneEvaluation.modification');
-    Route::put('/campagnes/{id}', [CampagneEvaluationController::class, 'update'])->name('campagneEvaluation.update');
-    Route::delete('/campagnes/{id}', [CampagneEvaluationController::class, 'destroy'])->name('campagneEvaluation.suppression');
-    Route::get('/campagnes/details/{id}', [CampagneEvaluationController::class, 'show'])->name('campagneEvaluation.details');
+    Route::resource('campagnes', CampagneEvaluationController::class)->names([
+        'index' => 'campagneEvaluation.index',
+        'create' => 'campagneEvaluation.creation',
+        'store' => 'campagneEvaluation.store',
+        'edit' => 'campagneEvaluation.modification',
+        'update' => 'campagneEvaluation.update',
+        'destroy' => 'campagneEvaluation.suppression',
+        'show' => 'campagneEvaluation.details',
+    ]);
 
     // Types d'Évaluation
-    Route::get('/type_evaluations/index', [TypeEvaluationController::class, 'index'])->name('type_evaluations.index');
-    Route::get('/type_evaluations/creation', [TypeEvaluationController::class, 'creation'])->name('type_evaluations.creation');
-    Route::post('/type_evaluations', [TypeEvaluationController::class, 'store'])->name('type_evaluations.store');
-    Route::get('/type_evaluations/modification/{id}', [TypeEvaluationController::class, 'modification'])->name('type_evaluations.modification');
-    Route::put('/type_evaluations/{id}', [TypeEvaluationController::class, 'update'])->name('type_evaluations.update');
-    Route::delete('/type_evaluations/{id}', [TypeEvaluationController::class, 'destroy'])->name('type_evaluations.suppression');
-    Route::get('/type_evaluations/details/{id}', [TypeEvaluationController::class, 'details'])->name('type_evaluations.details');
+    Route::resource('type_evaluations', TypeEvaluationController::class)->names([
+        'index' => 'type_evaluations.index',
+        'create' => 'type_evaluations.creation',
+        'store' => 'type_evaluations.store',
+        'edit' => 'type_evaluations.modification',
+        'update' => 'type_evaluations.update',
+        'destroy' => 'type_evaluations.suppression',
+        'show' => 'type_evaluations.details',
+    ]);
 
     // Évaluations
-    Route::get('/evaluations/index', [EvaluationController::class, 'index'])->name('evaluations.index');
-    Route::get('/evaluations/creation', [EvaluationController::class, 'create'])->name('evaluations.creation');
-    Route::post('/evaluations', [EvaluationController::class, 'store'])->name('evaluations.store');
-    Route::get('/evaluations/details/{id}', [EvaluationController::class, 'show'])->name('evaluations.details');
-    Route::get('/evaluations/modification/{id}', [EvaluationController::class, 'edit'])->name('evaluations.modification');
-    Route::put('/evaluations/{id}', [EvaluationController::class, 'update'])->name('evaluations.update');
-    Route::delete('/evaluations/{id}', [EvaluationController::class, 'destroy'])->name('evaluations.suppression');
+    Route::resource('evaluations', EvaluationController::class)->names([
+        'index' => 'evaluations.index',
+        'create' => 'evaluations.creation',
+        'store' => 'evaluations.store',
+        'edit' => 'evaluations.modification',
+        'update' => 'evaluations.update',
+        'destroy' => 'evaluations.suppression',
+        'show' => 'evaluations.details',
+    ]);
+
+    // Gestion des compétences associées à une évaluation
+    Route::get('/evaluations/{id}/competences', [EvaluationController::class, 'editCompetences'])->name('evaluations.competences.edit');
+    Route::post('/evaluations/{id}/competences', [EvaluationController::class, 'updateCompetences'])->name('evaluations.competences.update');
+    Route::put('/evaluations/{id}/competences', [EvaluationController::class, 'updateCompetences']);
 
     // Rôles
-    Route::resource('/roles', RoleController::class)->names([
+    Route::resource('roles', RoleController::class)->names([
         'index' => 'roles.index',
         'create' => 'roles.creation',
         'store' => 'roles.store',
-        'edit' => 'roles.edit',
+        'edit' => 'roles.modification',
         'update' => 'roles.update',
-        'destroy' => 'roles.destroy',
-        'show' => 'roles.show',
+        'destroy' => 'roles.suppression',
+        'show' => 'roles.details',
     ]);
 
     // Utilisateurs
-    Route::resource('/users', UserController::class)->names([
+    Route::resource('users', UserController::class)->names([
         'index' => 'user.index',
         'create' => 'user.creation',
         'store' => 'user.store',
@@ -89,18 +115,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/{id}/details', [UserController::class, 'details'])->name('user.details');
 
     // Objectifs
-    Route::resource('/objectifs', ObjectifController::class)->names([
+    Route::resource('objectifs', ObjectifController::class)->names([
         'index' => 'objectifs.index',
         'create' => 'objectifs.creation',
         'store' => 'objectifs.store',
         'edit' => 'objectifs.modification',
         'update' => 'objectifs.update',
         'destroy' => 'objectifs.destroy',
+        'show' => 'objectifs.details',
     ]);
-    Route::get('/objectifs/details/{id}', [ObjectifController::class, 'show'])->name('objectifs.details');
 
     // Compétences
-    Route::resource('/competences', CompetenceController::class)->names([
+    Route::resource('competences', CompetenceController::class)->names([
         'index' => 'competences.index',
         'create' => 'competences.create',
         'store' => 'competences.store',
@@ -111,19 +137,53 @@ Route::middleware(['auth'])->group(function () {
     ]);
 
     // Grilles d'Évaluation
-    Route::resource('/grilles', GrilleEvaluationController::class)->names([
+    Route::resource('grilles', GrilleEvaluationController::class)->names([
         'index' => 'grilleEvaluation.index',
         'create' => 'grilleEvaluation.creation',
         'store' => 'grilleEvaluation.store',
         'edit' => 'grilleEvaluation.modification',
         'update' => 'grilleEvaluation.update',
         'destroy' => 'grilleEvaluation.suppression',
+        'show' => 'grilleEvaluation.details',
     ]);
-    Route::get('/grilles/details/{id}', [GrilleEvaluationController::class, 'details'])->name('grilleEvaluation.details');
+
+    // Critères d'Évaluation
+    Route::resource('critere_evaluation', CritereEvaluationController::class)->names([
+        'index' => 'criteres_evaluation.index',
+        'create' => 'criteres_evaluation.creation',
+        'store' => 'criteres_evaluation.store',
+        'edit' => 'criteres_evaluation.modification',
+        'update' => 'criteres_evaluation.update',
+        'destroy' => 'criteres_evaluation.suppression',
+        'show' => 'criteres_evaluation.details',
+    ]);
 
     // Profil
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+
+    // ✅ Route de test mail
+    Route::get('/test-mail', function () {
+        $user = \App\Models\User::first();
+        $evaluation = \App\Models\Evaluation::first();
+
+        if (!$user || !$evaluation) {
+            return response('Pas assez de données pour tester.', 404);
+        }
+
+        $data = [
+            'nom' => $user->prenom . ' ' . $user->nom,
+            'titre' => $evaluation->titre,
+        ];
+
+        try {
+            Mail::to($user->email)->send(new NotificationEvaluation($data));
+        } catch (\Exception $e) {
+            return response('Erreur lors de l\'envoi du mail : ' . $e->getMessage(), 500);
+        }
+
+        return 'Mail envoyé (ou en file d’attente) à ' . $user->email;
+    });
+
 });
 
-// Auth routes (inscription, mot de passe, etc.)
 require __DIR__.'/auth.php';

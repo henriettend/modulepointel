@@ -1,17 +1,27 @@
 <?php
 
-namespace App\Models;
+namespace App\Models; // ← À ne pas oublier
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\CritereEvaluation;
 
 class Competence extends Model
 {
     use HasFactory;
 
-    // Champs autorisés à être remplis via formulaire (mass assignment)
     protected $fillable = [
         'intitule',
         'type',
     ];
+
+    public function criteres()
+    {
+
+    return $this->hasMany(CritereEvaluation::class, 'competence_id');    }
+    
 }
+
+
+
+

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Historique;
 
 class HistoriqueController extends Controller
 {
-    //
+    public function index()
+    {
+        $historiques = Historique::with('user')->latest()->paginate(10);
+        return view('historiques.index', compact('historiques'));
+    }
 }

@@ -1,45 +1,49 @@
 @extends('layouts.master')
 
 @section('content')
-  <div class="container mt-5">
-    <div class="card shadow rounded">
-      <div class="card-header bg-info text-white">
-        <h3 class="mb-0">Détails de la compétence</h3>
-      </div>
-      <div class="card-body">
-        <div class="mb-3">
-          <strong>Intitulé :</strong>
-          <p>{{ $competence->intitule }}</p>
-        </div>
+    <div class="container mt-5">
+        <div class="card p-4 shadow-sm">
+            <h2 class="mb-4 text-primary">Détail de l'évaluation : {{ $evaluation->titre }}</h2>
 
-        <div class="mb-3">
-          <strong>Type :</strong>
-          <p>{{ ucfirst($competence->type) }}</p>
-        </div>
+            <p><strong>Description :</strong> {{ $evaluation->description }}</p>
+            <p><strong>Date début :</strong> {{ $evaluation->dateDebut }}</p>
+            <p><strong>Date fin :</strong> {{ $evaluation->dateFin }}</p>
+            <p><strong>Statut :</strong> {{ $evaluation->statut }}</p>
+            <p><strong>Employé évalué :</strong> {{ $evaluation->user->prenom }} {{ $evaluation->user->nom }}</p>
+            <p><strong>Manager :</strong> {{ $evaluation->manager->prenom }} {{ $evaluation->manager->nom }}</p>
+            <p><strong>Campagne :</strong> {{ $evaluation->campagne->titre ?? 'Non spécifiée' }}</p>
+            <p><strong>Type :</strong> {{ $evaluation->typeEvaluation->intitule }}</p>
 
-        <div class="mb-3">
-          <strong>Créée le :</strong>
-          <p>{{ $competence->created_at->format('d/m/Y à H:i') }}</p>
-        </div>
+            <hr>
 
-        <div class="mb-3">
-          <strong>Dernière mise à jour :</strong>
-          <p>{{ $competence->updated_at->format('d/m/Y à H:i') }}</p>
-        </div>
-      </div>
-      <div class="card-footer d-flex justify-content-between">
-        <a href="{{ route('competences.index') }}" class="btn btn-secondary">← Retour à la liste</a>
+            <h4 class="mt-4 fw-bold text-primary">Compétences associées</h4>
 
-        <div>
-          <a href="{{ route('competences.modification', $competence->id) }}" class="btn btn-warning me-2">Modifier</a>
+            @forelse($evaluation->competences as $competence)
+                <div class="mb-4 ps-3 border-start border-4 border-primary">
+                    <h5 class="fw-semibold text-dark">{{ $competence->intitule }}</h5>
 
-          <form action="{{ route('competences.destroy', $competence->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?')">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">Supprimer</button>
-          </form>
+                    @if ($competence->criteres->isNotEmpty())
+                        <ul class="ms-3">
+                            @foreach ($competence->criteres as $critere)
+                                <li>
+                                    <strong>{{ $critere->titre }}</strong>
+                                    @if($critere->description)
+                                        — <em>{{ $critere->description }}</em>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="text-muted ms-3">Aucun critère défini pour cette compétence.</p>
+                    @endif
+                </div>
+            @empty
+                <p class="text-muted">Aucune compétence associée à cette évaluation.</p>
+            @endforelse
+
+            <div class="mt-4">
+                <a href="{{ route('evaluations.index') }}" class="btn btn-secondary">Retour à la liste</a>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 @endsection
