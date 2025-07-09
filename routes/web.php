@@ -20,10 +20,10 @@ use App\Http\Controllers\CompetenceController;
 // ==========================
 Route::get('/', [CampagneEvaluationController::class, 'index'])->name('campagneEvaluation.index');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 // ==========================
 // Campagnes d'Évaluation
 // ==========================
