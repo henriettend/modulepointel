@@ -5,7 +5,7 @@
     
 
                 <!-- Dashboard Ecommerce Starts -->
-                <section id="dashboard-ecommerce">
+         <section id="dashboard-ecommerce">
                 <div class="row match-height">
     <!-- Medal Card -->
     <div class="col-xl-4 col-md-6 col-12">
@@ -140,70 +140,123 @@
 
                                 <!-- Earnings Card -->
                                 <div class="col-lg-12 col-md-6 col-12">
-                                    <div class="card earnings-card">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-6">
-                                                    <h4 class="card-title mb-1">Earnings</h4>
-                                                    <div class="font-small-2">This Month</div>
-                                                    <h5 class="mb-1">$4055.56</h5>
-                                                    <p class="card-text text-muted font-small-2">
-                                                        <span class="fw-bolder">68.2%</span><span> more earnings than last month.</span>
-                                                    </p>
-                                                </div>
-                                                <div class="col-6">
-                                                    <div id="earnings-chart"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+    <div class="card earnings-card">
+        <div class="card-body">
+            <div class="row">
+                <!-- Partie gauche : texte -->
+                <div class="col-6">
+                    <h4 class="card-title mb-1">Évaluations Moyennes</h4>
+                    <div class="font-small-2">Par Employé</div>
+                    <h5 class="mb-1">{{ $moyenneEvaluations }}</h5>
+                    <p class="card-text text-muted font-small-2">
+                        <span class="fw-bolder">Basé sur {{ $totalUsers }} employés</span>
+                    </p>
+                </div>
+
+                <!-- Partie droite : icône ou graphique simple -->
+                <div class="col-6 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-bar-chart-line-fill" style="font-size: 2.5rem; color: #00c49f;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
                                 <!--/ Earnings Card -->
                             </div>
                         </div>
 
                         <!-- Revenue Report Card -->
-                        <div class="col-lg-8 col-12">
-                            <div class="card card-revenue-budget">
-                                <div class="row mx-0">
-                                    <div class="col-md-8 col-12 revenue-report-wrapper">
-                                        <div class="d-sm-flex justify-content-between align-items-center mb-3">
-                                            <h4 class="card-title mb-50 mb-sm-0">Revenue Report</h4>
-                                            <div class="d-flex align-items-center">
-                                                <div class="d-flex align-items-center me-2">
-                                                    <span class="bullet bullet-primary font-small-3 me-50 cursor-pointer"></span>
-                                                    <span>Earning</span>
-                                                </div>
-                                                <div class="d-flex align-items-center ms-75">
-                                                    <span class="bullet bullet-warning font-small-3 me-50 cursor-pointer"></span>
-                                                    <span>Expense</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="revenue-report-chart"></div>
-                                    </div>
-                                    <div class="col-md-4 col-12 budget-wrapper">
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle budget-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                2020
-                                            </button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="#">2020</a>
-                                                <a class="dropdown-item" href="#">2019</a>
-                                                <a class="dropdown-item" href="#">2018</a>
-                                            </div>
-                                        </div>
-                                        <h2 class="mb-25">$25,852</h2>
-                                        <div class="d-flex justify-content-center">
-                                            <span class="fw-bolder me-25">Budget:</span>
-                                            <span>56,800</span>
-                                        </div>
-                                        <div id="budget-chart"></div>
-                                        <button type="button" class="btn btn-primary">Increase Budget</button>
-                                    </div>
-                                </div>
-                            </div>
+                       <!-- Inclure ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<div class="col-lg-8 col-12">
+    <div class="card card-revenue-budget">
+        <div class="row mx-0">
+            <!-- Partie Graphique -->
+            <div class="col-md-8 col-12 revenue-report-wrapper">
+                <div class="d-sm-flex justify-content-between align-items-center mb-3">
+                    <h4 class="card-title mb-50 mb-sm-0">Rapport des évaluations</h4>
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center me-2">
+                            <span class="bullet bullet-primary font-small-3 me-50 cursor-pointer"></span>
+                            <span>Terminées</span>
                         </div>
+                        <div class="d-flex align-items-center ms-75">
+                            <span class="bullet bullet-warning font-small-3 me-50 cursor-pointer"></span>
+                            <span>Annulées</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Conteneur du graphique -->
+                <div id="evaluation-report-chart"></div>
+            </div>
+
+            <!-- Partie Budget latérale (facultative, tu peux adapter selon tes données) -->
+            <div class="col-md-4 col-12 budget-wrapper">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle budget-dropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ now()->year }}
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">2025</a>
+                        <a class="dropdown-item" href="#">2024</a>
+                        <a class="dropdown-item" href="#">2023</a>
+                    </div>
+                </div>
+                <h2 class="mb-25">{{ number_format(array_sum($dataTerminees), 0, ',', ' ') }} évaluations</h2>
+                <div class="d-flex justify-content-center">
+                    <span class="fw-bolder me-25">Objectif:</span>
+                    <span>{{ number_format(12, 0, ',', ' ') }}</span>
+                </div>
+                <div id="budget-chart"></div>
+                <button type="button" class="btn btn-primary">Augmenter l’objectif</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script ApexCharts -->
+<script>
+    var options = {
+        chart: {
+            type: 'bar',
+            height: 350,
+            stacked: true
+        },
+        series: [
+            {
+                name: 'Terminées',
+                data: @json($dataTerminees)
+            },
+            {
+                name: 'Annulées',
+                data: @json($dataAnnulees)
+            }
+        ],
+        xaxis: {
+            categories: @json($moisLabels)
+        },
+        colors: ['#7367F0', '#FF9F43'],
+        legend: {
+            position: 'top'
+        },
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: '45%'
+            }
+        },
+        fill: {
+            opacity: 1
+        }
+    };
+
+    var chart = new ApexCharts(document.querySelector("#evaluation-report-chart"), options);
+    chart.render();
+</script>
+
                         <!--/ Revenue Report Card -->
                     </div>
 

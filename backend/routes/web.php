@@ -25,34 +25,58 @@ Route::post('/connexion', [AuthenticatedSessionController::class, 'store'])->nam
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/dashboard', function () {
+Route::get('/dashboard', function () {
 
-        // Récupération des statistiques
-        $totalEvaluations = Evaluation::count();
-        $evaluationsTermines = Evaluation::where('statut', 'terminée')->count();
-        $evaluationsEnCours = Evaluation::where('statut', 'en cours')->count();
-        $evaluationsAnnules = Evaluation::where('statut', 'annulée')->count();  
-        $evaluationsEnAttente = Evaluation::where('statut', 'en attente')->count();
-        // Calcul du taux de participation
-        $employesEvalues = Evaluation::where('statut', 'terminée')->distinct('user_id')->count('user_id');
-        $totalUsers = \App\Models\User::count();
-        $tauxParticipation = $totalUsers > 0 ? ($employesEvalues / $totalUsers) * 100 : 0;
-        $tauxParticipation = round($tauxParticipation, 2);
+    // Récupération des statistiques
+    $totalEvaluations = Evaluation::count();
+    $evaluationsTermines = Evaluation::where('statut', 'terminée')->count();
+    $evaluationsEnCours = Evaluation::where('statut', 'en cours')->count();
+    $evaluationsAnnules = Evaluation::where('statut', 'annulée')->count();  
+    $evaluationsEnAttente = Evaluation::where('statut', 'en attente')->count();
 
-        return view('welcome', compact(
-            'totalEvaluations',
-            'evaluationsTermines',
-            'evaluationsEnCours',
-            'evaluationsAnnules',
-            'evaluationsEnAttente',
-            'tauxParticipation'
-            ,'employesEvalues',
-            'totalUsers'
+    // Calcul du taux de participation
+    $employesEvalues = Evaluation::where('statut', 'terminée')->distinct('user_id')->count('user_id');
+    $totalUsers = \App\Models\User::count();
+    $tauxParticipation = $totalUsers > 0 ? ($employesEvalues / $totalUsers) * 100 : 0;
+    $tauxParticipation = round($tauxParticipation, 2);
 
-            
+    // Données pour le graphique mensuel (6 derniers mois)
+    $dataMois = [];
+    $moisLabels = [];
+    $dataTerminees = [];
+    $dataAnnulees = [];
+    
 
-        ));
-    })->name('dashboard');
+    for ($i = 5; $i >= 0; $i--) {
+        $date = now()->subMonths($i);
+        $mois = $date->format('Y-m');
+        $libelle = ucfirst($date->locale('fr')->isoFormat('MMMM YYYY'));
+
+        $moisLabels[] = $libelle;
+        $count = Evaluation::whereYear('created_at', $date->year)
+            ->whereMonth('created_at', $date->month)
+            ->count();
+
+        $dataMois[] = $count; // <- Remplissage manquant
+    }
+
+    return view('welcome', compact(
+        'totalEvaluations',
+        'evaluationsTermines',
+        'evaluationsEnCours',
+        'evaluationsAnnules',
+        'evaluationsEnAttente',
+        'tauxParticipation',
+        'employesEvalues',
+        'totalUsers',
+        'dataMois',
+       'dataTerminees',
+        'dataAnnulees',
+        'moisLabels',
+        'moyenneEvaluations'
+
+    ));
+})->name('dashboard');
 
     // Campagnes d'Évaluation
     Route::resource('campagnes', CampagneEvaluationController::class)->names([
@@ -161,7 +185,7 @@ Route::middleware(['auth'])->group(function () {
     // Profil
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
 
-    // ✅ Route de test mail
+    //  Route de test mail
     Route::get('/test-mail', function () {
         $user = \App\Models\User::first();
         $evaluation = \App\Models\Evaluation::first();
@@ -182,6 +206,9 @@ Route::middleware(['auth'])->group(function () {
         }
 
         return 'Mail envoyé (ou en file d’attente) à ' . $user->email;
+
+
+
     });
 
 });

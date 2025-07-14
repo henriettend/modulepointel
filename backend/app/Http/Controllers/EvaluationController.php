@@ -10,7 +10,6 @@ use App\Models\Competence;
 use Illuminate\Http\Request;
 use App\Mail\NotificationEvaluation;
 use Illuminate\Support\Facades\Mail;
-use PhpParser\Node\Stmt\TryCatch;
 
 class EvaluationController extends Controller
 {
@@ -113,7 +112,6 @@ class EvaluationController extends Controller
             'user_id' => 'required|exists:users,id|different:manager_id',
             'campagne_evaluations_id' => 'nullable|exists:campagne_evaluations,id',
             'type_evaluation_id' => 'required|exists:type_evaluations,id',
-            // Retiré 'competences.criteres' qui est invalide en validation
         ]);
 
         $manager = User::with('role')->find($validated['manager_id']);
@@ -123,6 +121,7 @@ class EvaluationController extends Controller
 
         $evaluation->update($validated);
 
+        // ✅ Redirection vers la liste des évaluations
         return redirect()->route('evaluations.index')->with('success', 'Évaluation mise à jour avec succès.');
     }
 
@@ -149,24 +148,21 @@ class EvaluationController extends Controller
     public function updateCompetences(Request $request, $id)
     {
         $evaluation = Evaluation::findOrFail($id);
-
         $competenceIds = $request->input('competences', []);
 
-        // Synchronise uniquement les compétences sélectionnées
         $evaluation->competences()->sync($competenceIds);
 
         try {
-            // Envoi de la notification par mail à l'utilisateur évalué
             $this->sendNotificationMail($evaluation->user, $evaluation);
         } catch (\Exception $e) {
             return back()->withErrors(['email' => 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage()]);
         }
 
-
-        return redirect()->route('evaluations.details', $evaluation->id)->with('success', 'Compétences mises à jour avec succès.');
+        return redirect()->route('evaluations.details', $evaluation->id)
+                         ->with('success', 'Compétences mises à jour avec succès.');
     }
 
-    // Méthode optionnelle pour envoyer une notification par mail à un utilisateur (exemple)
+    // Envoi d’une notification par mail
     public function sendNotificationMail(User $user, Evaluation $evaluation)
     {
         $data = [
@@ -174,11 +170,6 @@ class EvaluationController extends Controller
             'titre' => $evaluation->titre,
         ];
 
-        try
-         { Mail::to($user->email)->send(new NotificationEvaluation($data));
-            }
-        catch (\Exception $e) {
-            return back()->withErrors(['email' => 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage()]);
-        }
+        Mail::to($user->email)->send(new NotificationEvaluation($data));
     }
 }

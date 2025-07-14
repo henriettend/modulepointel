@@ -4,7 +4,7 @@
     <div class="card shadow-lg p-4 w-100" style="max-width: 650px;">
         <h3 class="text-center mb-4">Modifier la Campagne</h3>
 
-        <form action="{{ route('campagneEvaluation.update', ['id' => $campagne->id]) }}" method="POST">
+<form action="{{ route('campagneEvaluation.update', $campagne) }}" method="POST">
             @csrf
             @method('PUT')
 
